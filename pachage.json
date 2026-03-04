@@ -1,5 +1,5 @@
 {
-  "name": "grandiagonal",
+  "name": "familyfit",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
@@ -10,10 +10,14 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build"
+    "build": "react-scripts build",
+    "install": "npm install"
   },
   "browserslist": {
     "production": [">0.2%", "not dead"],
     "development": ["last 1 chrome version"]
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
