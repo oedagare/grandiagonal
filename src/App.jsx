@@ -2,9 +2,9 @@ import { useState } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const USUARIOS_INICIAIS = [
-  { id: 1, nome: "João", avatar: "👨", cor: "#3b82f6", peso: 78, altura: 178, obj_cal: 2400, obj_prot: 180, obj_hid: 260, obj_gord: 70, obj_agua: 3000 },
-  { id: 2, nome: "Ana", avatar: "👩", cor: "#ec4899", peso: 62, altura: 165, obj_cal: 1900, obj_prot: 140, obj_hid: 200, obj_gord: 55, obj_agua: 2500 },
-  { id: 3, nome: "Miguel", avatar: "👦", cor: "#10b981", peso: 55, altura: 160, obj_cal: 2100, obj_prot: 120, obj_hid: 250, obj_gord: 60, obj_agua: 2000 },
+  { id: 1, nome: "João", avatar: "👨", cor: "#f97316", peso: 78, altura: 178, obj_cal: 2400, obj_prot: 180, obj_hid: 260, obj_gord: 70, obj_agua: 3000 },
+  { id: 2, nome: "Ana", avatar: "👩", cor: "#f97316", peso: 62, altura: 165, obj_cal: 1900, obj_prot: 140, obj_hid: 200, obj_gord: 55, obj_agua: 2500 },
+  { id: 3, nome: "Miguel", avatar: "👦", cor: "#f97316", peso: 55, altura: 160, obj_cal: 2100, obj_prot: 120, obj_hid: 250, obj_gord: 60, obj_agua: 2000 },
 ];
 
 const ALIMENTOS_DB = [
@@ -30,59 +30,74 @@ const EXERCICIOS = ["Supino Plano","Supino Inclinado","Agachamento","Leg Press",
 const hoje = () => new Date().toISOString().split("T")[0];
 const fmt = (n, d = 0) => Number(n || 0).toFixed(d);
 
+// ── DESIGN SYSTEM ─────────────────────────────────────────────────────────────
 const Card = ({ children, className = "" }) => (
-  <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-4 ${className}`}>{children}</div>
+  <div className={`bg-white border-2 border-gray-900 rounded-2xl p-4 ${className}`}>{children}</div>
 );
 
-const ProgressBar = ({ value, max, color }) => (
-  <div className="w-full bg-gray-100 rounded-full h-2">
-    <div className="h-2 rounded-full transition-all" style={{ width: `${Math.min(100, (value / max) * 100)}%`, backgroundColor: color }} />
+const ProgressBar = ({ value, max }) => (
+  <div className="w-full bg-gray-100 rounded-full h-3 border border-gray-200">
+    <div className="h-3 rounded-full bg-orange-500 transition-all" style={{ width: `${Math.min(100, (value / max) * 100)}%` }} />
   </div>
 );
 
 const Btn = ({ children, onClick, variant = "primary", size = "md", className = "", disabled = false }) => {
   const s = { sm: "px-3 py-1.5 text-xs", md: "px-4 py-2 text-sm", lg: "px-6 py-3 text-base" };
-  const v = { primary: "bg-gray-900 text-white hover:bg-gray-700", secondary: "bg-gray-100 text-gray-700 hover:bg-gray-200", danger: "bg-red-100 text-red-600" };
-  return <button onClick={onClick} disabled={disabled} className={`font-semibold rounded-xl transition-all ${s[size]} ${v[variant]} disabled:opacity-40 ${className}`}>{children}</button>;
+  const v = {
+    primary: "bg-gray-900 text-white hover:bg-orange-500 border-2 border-gray-900 hover:border-orange-500",
+    secondary: "bg-white text-gray-900 border-2 border-gray-900 hover:bg-gray-100",
+    orange: "bg-orange-500 text-white border-2 border-orange-500 hover:bg-orange-600",
+    danger: "bg-white text-red-500 border-2 border-red-300 hover:bg-red-50",
+  };
+  return <button onClick={onClick} disabled={disabled} className={`font-bold rounded-xl transition-all ${s[size]} ${v[variant]} disabled:opacity-40 ${className}`}>{children}</button>;
 };
 
 const Input = ({ label, type = "text", value, onChange, placeholder, className = "" }) => (
   <div className={className}>
-    {label && <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>}
+    {label && <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">{label}</label>}
     <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      className="w-full border-2 border-gray-900 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-500 font-medium" />
   </div>
 );
 
 const Sel = ({ label, value, onChange, options, className = "" }) => (
   <div className={className}>
-    {label && <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>}
-    <select value={value} onChange={e => onChange(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+    {label && <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">{label}</label>}
+    <select value={value} onChange={e => onChange(e.target.value)} className="w-full border-2 border-gray-900 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-500 font-medium">
       {options.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
     </select>
   </div>
 );
 
+const StatBox = ({ label, value, unit, color = "text-gray-900" }) => (
+  <div className="bg-white border-2 border-gray-900 rounded-xl p-3 text-center">
+    <p className={`text-xl font-black ${color}`}>{value}<span className="text-xs font-bold text-gray-500 ml-0.5">{unit}</span></p>
+    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mt-0.5">{label}</p>
+  </div>
+);
+
+// ── SELETOR DE PERFIL ─────────────────────────────────────────────────────────
 const SeletorPerfil = ({ usuarios, onSelect }) => (
-  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center p-6">
-    <div className="mb-8 text-center">
-      <div className="text-4xl mb-2">💪</div>
-      <h1 className="text-3xl font-bold text-gray-900">FamilyFit</h1>
-      <p className="text-gray-500 text-sm mt-1">Quem está a treinar hoje?</p>
+  <div className="min-h-screen bg-orange-500 flex flex-col items-center justify-center p-6">
+    <div className="mb-10 text-center">
+      <div className="bg-gray-900 text-white text-5xl w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4 font-black border-4 border-white">💪</div>
+      <h1 className="text-4xl font-black text-white tracking-tight">FAMILYFIT</h1>
+      <p className="text-orange-100 text-sm font-bold mt-1 uppercase tracking-widest">Quem treina hoje?</p>
     </div>
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-sm sm:max-w-lg">
       {usuarios.map(u => (
         <button key={u.id} onClick={() => onSelect(u)}
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center gap-3 hover:shadow-md hover:border-gray-300 transition-all group">
+          className="bg-white border-4 border-gray-900 rounded-2xl p-6 flex flex-col items-center gap-3 hover:bg-gray-900 hover:text-white transition-all group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <span className="text-5xl">{u.avatar}</span>
-          <span className="font-semibold text-gray-800">{u.nome}</span>
-          <div className="w-8 h-1 rounded-full" style={{ backgroundColor: u.cor }} />
+          <span className="font-black text-gray-900 group-hover:text-white text-lg uppercase">{u.nome}</span>
+          <div className="w-8 h-1.5 rounded-full bg-orange-500" />
         </button>
       ))}
     </div>
   </div>
 );
 
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
 const Dashboard = ({ u, registos, treinos }) => {
   const hoje_ = hoje();
   const rHoje = registos.filter(r => r.data === hoje_ && r.userId === u.id && r.tipo !== "agua");
@@ -100,77 +115,68 @@ const Dashboard = ({ u, registos, treinos }) => {
     return { dia: ["D","S","T","Q","Q","S","S"][d.getDay()], cal: c };
   });
 
-  const pie = [
-    { name: "Proteína", value: prot * 4, color: "#3b82f6" },
-    { name: "Hidratos", value: hid * 4, color: "#f59e0b" },
-    { name: "Gordura", value: gord * 9, color: "#ec4899" },
-  ].filter(m => m.value > 0);
-
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <span className="text-4xl">{u.avatar}</span>
-        <div>
-          <h2 className="font-bold text-gray-900 text-xl">Olá, {u.nome}!</h2>
-          <p className="text-xs text-gray-400">{new Date().toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long" })}</p>
+      {/* Hero */}
+      <div className="bg-gray-900 rounded-2xl p-5 border-2 border-gray-900 shadow-[4px_4px_0px_0px_rgba(249,115,22,1)]">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-orange-400 text-xs font-black uppercase tracking-widest">{new Date().toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long" })}</p>
+            <h2 className="font-black text-white text-2xl mt-0.5">Olá, {u.nome}! {u.avatar}</h2>
+          </div>
+          <div className="bg-orange-500 rounded-xl p-3 border-2 border-orange-400">
+            <p className="text-white text-xs font-black uppercase">Calorias</p>
+            <p className="text-white text-2xl font-black">{fmt(cal)}</p>
+          </div>
         </div>
+        <ProgressBar value={cal} max={u.obj_cal} />
+        <p className="text-gray-400 text-xs font-bold mt-2">OBJETIVO: {u.obj_cal} KCAL · RESTAM: {Math.max(0, u.obj_cal - cal)} KCAL</p>
       </div>
+
+      {/* Macros */}
+      <div className="grid grid-cols-3 gap-2">
+        <StatBox label="Proteína" value={fmt(prot)} unit="g" color="text-blue-600" />
+        <StatBox label="Hidratos" value={fmt(hid)} unit="g" color="text-orange-500" />
+        <StatBox label="Gordura" value={fmt(gord)} unit="g" color="text-pink-500" />
+      </div>
+
+      {/* Água */}
       <Card>
         <div className="flex justify-between items-center mb-2">
-          <span className="font-semibold text-gray-800">🔥 Calorias Hoje</span>
-          <span className="text-2xl font-bold" style={{ color: u.cor }}>{fmt(cal)}</span>
+          <span className="font-black text-gray-900 uppercase tracking-wide text-sm">💧 Água</span>
+          <span className="font-black text-blue-500">{agua} <span className="text-xs text-gray-400">/ {u.obj_agua}ml</span></span>
         </div>
-        <ProgressBar value={cal} max={u.obj_cal} color={u.cor} />
-        <p className="text-xs text-gray-400 mt-1">Objetivo: {u.obj_cal} kcal · Restam: {Math.max(0, u.obj_cal - cal)} kcal</p>
+        <ProgressBar value={agua} max={u.obj_agua} />
       </Card>
-      <Card>
-        <p className="font-semibold text-gray-800 mb-3">🥗 Macronutrientes</p>
-        <div className="grid grid-cols-3 gap-2 text-center mb-2">
-          <div><p className="text-xs text-gray-500">Proteína</p><p className="font-bold text-blue-600">{fmt(prot)}g</p><p className="text-xs text-gray-400">/{u.obj_prot}g</p></div>
-          <div><p className="text-xs text-gray-500">Hidratos</p><p className="font-bold text-amber-500">{fmt(hid)}g</p><p className="text-xs text-gray-400">/{u.obj_hid}g</p></div>
-          <div><p className="text-xs text-gray-500">Gordura</p><p className="font-bold text-pink-500">{fmt(gord)}g</p><p className="text-xs text-gray-400">/{u.obj_gord}g</p></div>
-        </div>
-        {pie.length > 0 && (
-          <ResponsiveContainer width="100%" height={110}>
-            <PieChart><Pie data={pie} cx="50%" cy="50%" innerRadius={30} outerRadius={50} paddingAngle={3} dataKey="value">
-              {pie.map((e, i) => <Cell key={i} fill={e.color} />)}
-            </Pie><Tooltip formatter={v => `${Math.round(v)} kcal`} /></PieChart>
-          </ResponsiveContainer>
-        )}
-      </Card>
-      <Card>
-        <div className="flex justify-between items-center mb-2">
-          <span className="font-semibold text-gray-800">💧 Água</span>
-          <span className="font-bold text-blue-500">{agua} ml</span>
-        </div>
-        <ProgressBar value={agua} max={u.obj_agua} color="#3b82f6" />
-        <p className="text-xs text-gray-400 mt-1">Objetivo: {u.obj_agua} ml</p>
-      </Card>
+
+      {/* Treinos hoje */}
       {tHoje.length > 0 && (
         <Card>
-          <p className="font-semibold text-gray-800 mb-2">🏋️ Treinos de Hoje</p>
+          <p className="font-black text-gray-900 uppercase tracking-wide text-sm mb-3">🏋️ Treinos de Hoje</p>
           {tHoje.map(t => (
-            <div key={t.id} className="flex justify-between items-center py-2 border-t border-gray-50">
+            <div key={t.id} className="flex justify-between items-center py-2 border-t-2 border-gray-100">
               <div className="flex items-center gap-2">
-                <span>{t.tipo === "ciclismo" ? "🚴" : "🏋️"}</span>
-                <span className="text-sm font-medium text-gray-700">{t.nome}</span>
+                <span className="text-xl">{t.tipo === "ciclismo" ? "🚴" : "🏋️"}</span>
+                <span className="text-sm font-bold text-gray-800">{t.nome}</span>
               </div>
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+              <span className="text-xs bg-orange-100 text-orange-700 font-bold px-2 py-1 rounded-lg border border-orange-200">
                 {t.tipo === "ciclismo" ? `${t.distancia || 0}km` : `${t.exercicios?.length || 0} ex.`}
               </span>
             </div>
           ))}
         </Card>
       )}
+
+      {/* Gráfico */}
       <Card>
-        <p className="font-semibold text-gray-800 mb-3">📊 Calorias — 7 dias</p>
+        <p className="font-black text-gray-900 uppercase tracking-wide text-sm mb-3">📊 Calorias — 7 dias</p>
         <ResponsiveContainer width="100%" height={130}>
           <BarChart data={ultimos7}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-            <XAxis dataKey="dia" tick={{ fontSize: 11 }} />
+            <XAxis dataKey="dia" tick={{ fontSize: 11, fontWeight: "bold" }} />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip formatter={v => `${v} kcal`} />
-            <Bar dataKey="cal" fill={u.cor} radius={[6, 6, 0, 0]} />
+            <Bar dataKey="cal" fill="#f97316" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Card>
@@ -178,6 +184,7 @@ const Dashboard = ({ u, registos, treinos }) => {
   );
 };
 
+// ── NUTRIÇÃO ──────────────────────────────────────────────────────────────────
 const Nutricao = ({ u, registos, setRegistos }) => {
   const [aba, setAba] = useState("hoje");
   const [modalFood, setModalFood] = useState(false);
@@ -222,82 +229,95 @@ const Nutricao = ({ u, registos, setRegistos }) => {
     <div className="space-y-4">
       <div className="flex gap-2">
         {["hoje", "30dias"].map(a => (
-          <button key={a} onClick={() => setAba(a)} className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-all ${aba === a ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600"}`}>
+          <button key={a} onClick={() => setAba(a)} className={`px-4 py-2 rounded-xl text-sm font-black uppercase tracking-wide transition-all border-2 ${aba === a ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"}`}>
             {a === "hoje" ? "Hoje" : "30 Dias"}
           </button>
         ))}
       </div>
+
       {aba === "hoje" && <>
         <div className="flex gap-2">
-          <Btn onClick={() => setModalFood(true)} className="flex-1">+ Alimento</Btn>
+          <Btn onClick={() => setModalFood(true)} variant="orange" className="flex-1">+ Alimento</Btn>
           <Btn onClick={() => setModalAgua(true)} variant="secondary">💧 Água</Btn>
         </div>
+
         <Card>
-          <div className="flex justify-between items-center mb-1">
-            <span className="font-semibold text-sm text-gray-700">💧 Água hoje</span>
-            <span className="font-bold text-blue-500 text-sm">{aguaHoje} / {u.obj_agua} ml</span>
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-black text-gray-900 uppercase text-xs tracking-wide">💧 Água hoje</span>
+            <span className="font-black text-blue-500">{aguaHoje} / {u.obj_agua} ml</span>
           </div>
-          <ProgressBar value={aguaHoje} max={u.obj_agua} color="#3b82f6" />
+          <ProgressBar value={aguaHoje} max={u.obj_agua} />
         </Card>
+
         {refs.map(ref => {
           const items = rHoje.filter(r => r.refeicao === ref);
           if (!items.length) return null;
           return (
             <Card key={ref}>
               <div className="flex justify-between mb-2">
-                <span className="font-semibold text-sm capitalize text-gray-700">{ref}</span>
-                <span className="text-xs text-gray-400">{items.reduce((s, r) => s + r.cal, 0)} kcal</span>
+                <span className="font-black text-sm capitalize text-gray-900 uppercase tracking-wide">{ref}</span>
+                <span className="text-xs font-bold text-orange-500">{items.reduce((s, r) => s + r.cal, 0)} kcal</span>
               </div>
               {items.map(item => (
-                <div key={item.id} className="flex justify-between items-center py-1.5 border-t border-gray-50">
+                <div key={item.id} className="flex justify-between items-center py-2 border-t-2 border-gray-100">
                   <div>
-                    <p className="text-sm text-gray-800">{item.nome}</p>
-                    <p className="text-xs text-gray-400">P:{fmt(item.prot)}g · H:{fmt(item.hid)}g · G:{fmt(item.gord)}g</p>
+                    <p className="text-sm font-bold text-gray-900">{item.nome}</p>
+                    <p className="text-xs text-gray-400 font-medium">P:{fmt(item.prot)}g · H:{fmt(item.hid)}g · G:{fmt(item.gord)}g</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold">{item.cal} kcal</span>
-                    <button onClick={() => setRegistos(p => p.filter(r => r.id !== item.id))} className="text-red-300 hover:text-red-500">✕</button>
+                    <span className="text-sm font-black text-gray-900">{item.cal} kcal</span>
+                    <button onClick={() => setRegistos(p => p.filter(r => r.id !== item.id))} className="text-red-300 hover:text-red-500 font-bold">✕</button>
                   </div>
                 </div>
               ))}
             </Card>
           );
         })}
-        {rHoje.length === 0 && <div className="text-center py-12 text-gray-400"><p className="text-3xl mb-2">🥗</p><p className="text-sm">Ainda sem refeições hoje</p></div>}
+
+        {rHoje.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-4xl mb-2">🥗</p>
+            <p className="text-sm font-bold text-gray-400 uppercase tracking-wide">Ainda sem refeições hoje</p>
+          </div>
+        )}
       </>}
-      {aba === "30dias" && <Card>
-        <p className="font-semibold text-gray-800 mb-3">📈 Evolução de Macros (30 dias)</p>
-        <ResponsiveContainer width="100%" height={180}>
-          <LineChart data={ultimos30}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-            <XAxis dataKey="dia" tick={{ fontSize: 10 }} />
-            <YAxis tick={{ fontSize: 10 }} />
-            <Tooltip />
-            <Line type="monotone" dataKey="prot" stroke="#3b82f6" dot={false} name="Proteína(g)" />
-            <Line type="monotone" dataKey="hid" stroke="#f59e0b" dot={false} name="Hidratos(g)" />
-          </LineChart>
-        </ResponsiveContainer>
-        <ResponsiveContainer width="100%" height={130} className="mt-3">
-          <BarChart data={ultimos30}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-            <XAxis dataKey="dia" tick={{ fontSize: 10 }} />
-            <YAxis tick={{ fontSize: 10 }} />
-            <Tooltip formatter={v => `${Math.round(v)} kcal`} />
-            <Bar dataKey="cal" fill={u.cor} radius={[4, 4, 0, 0]} name="Calorias" />
-          </BarChart>
-        </ResponsiveContainer>
-      </Card>}
+
+      {aba === "30dias" && (
+        <Card>
+          <p className="font-black text-gray-900 uppercase tracking-wide text-sm mb-3">📈 Evolução de Macros</p>
+          <ResponsiveContainer width="100%" height={180}>
+            <LineChart data={ultimos30}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+              <XAxis dataKey="dia" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Line type="monotone" dataKey="prot" stroke="#3b82f6" dot={false} name="Proteína(g)" strokeWidth={2} />
+              <Line type="monotone" dataKey="hid" stroke="#f97316" dot={false} name="Hidratos(g)" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+          <ResponsiveContainer width="100%" height={130} className="mt-3">
+            <BarChart data={ultimos30}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+              <XAxis dataKey="dia" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip formatter={v => `${Math.round(v)} kcal`} />
+              <Bar dataKey="cal" fill="#111827" radius={[4, 4, 0, 0]} name="Calorias" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+      )}
+
       {modalFood && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-4" onClick={() => setModalFood(false)}>
-          <div className="bg-white rounded-2xl p-5 w-full max-w-md shadow-xl" onClick={e => e.stopPropagation()}>
-            <h3 className="font-bold text-gray-900 mb-3">Adicionar Alimento</h3>
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4" onClick={() => setModalFood(false)}>
+          <div className="bg-white rounded-2xl p-5 w-full max-w-md shadow-xl border-2 border-gray-900" onClick={e => e.stopPropagation()}>
+            <h3 className="font-black text-gray-900 mb-3 uppercase tracking-wide">Adicionar Alimento</h3>
             <div className="relative mb-3">
               <Input label="Pesquisar base de dados" value={busca} onChange={setBusca} placeholder="ex: frango, arroz..." />
               {resultados.length > 0 && (
-                <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-xl shadow-lg mt-1 max-h-36 overflow-y-auto">
+                <div className="absolute z-10 w-full bg-white border-2 border-gray-900 rounded-xl shadow-lg mt-1 max-h-36 overflow-y-auto">
                   {resultados.map(a => (
-                    <button key={a.nome} onClick={() => selecionar(a)} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-b border-gray-50 last:border-0">
-                      <span className="font-medium">{a.nome}</span><span className="text-gray-400 text-xs ml-2">{a.cal} kcal</span>
+                    <button key={a.nome} onClick={() => selecionar(a)} className="w-full text-left px-3 py-2 text-sm hover:bg-orange-50 border-b border-gray-100 last:border-0">
+                      <span className="font-bold">{a.nome}</span><span className="text-gray-400 text-xs ml-2">{a.cal} kcal</span>
                     </button>
                   ))}
                 </div>
@@ -313,24 +333,25 @@ const Nutricao = ({ u, registos, setRegistos }) => {
               <Sel label="Refeição" value={form.refeicao} onChange={v => setForm({...form, refeicao: v})} options={refs.map(r => ({v: r, l: r}))} className="col-span-2" />
             </div>
             <div className="flex gap-2 mt-3">
-              <Btn onClick={addFood} className="flex-1">Adicionar</Btn>
+              <Btn onClick={addFood} variant="orange" className="flex-1">Adicionar</Btn>
               <Btn onClick={() => setModalFood(false)} variant="secondary">Cancelar</Btn>
             </div>
           </div>
         </div>
       )}
+
       {modalAgua && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setModalAgua(false)}>
-          <div className="bg-white rounded-2xl p-5 w-full max-w-xs shadow-xl" onClick={e => e.stopPropagation()}>
-            <h3 className="font-bold text-gray-900 mb-3">💧 Registar Água</h3>
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setModalAgua(false)}>
+          <div className="bg-white rounded-2xl p-5 w-full max-w-xs shadow-xl border-2 border-gray-900" onClick={e => e.stopPropagation()}>
+            <h3 className="font-black text-gray-900 mb-3 uppercase tracking-wide">💧 Registar Água</h3>
             <div className="grid grid-cols-3 gap-2 mb-3">
               {[150,250,330,500,750,1000].map(v => (
-                <button key={v} onClick={() => setAguaVal(String(v))} className={`py-2 rounded-xl text-sm font-medium transition-all ${aguaVal === String(v) ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}>{v}ml</button>
+                <button key={v} onClick={() => setAguaVal(String(v))} className={`py-2 rounded-xl text-sm font-black transition-all border-2 ${aguaVal === String(v) ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-700 border-gray-300 hover:border-gray-900"}`}>{v}ml</button>
               ))}
             </div>
             <Input label="Quantidade (ml)" type="number" value={aguaVal} onChange={setAguaVal} />
             <div className="flex gap-2 mt-3">
-              <Btn onClick={addAgua} className="flex-1">Adicionar</Btn>
+              <Btn onClick={addAgua} variant="orange" className="flex-1">Adicionar</Btn>
               <Btn onClick={() => setModalAgua(false)} variant="secondary">Cancelar</Btn>
             </div>
           </div>
@@ -340,6 +361,7 @@ const Nutricao = ({ u, registos, setRegistos }) => {
   );
 };
 
+// ── TREINOS ───────────────────────────────────────────────────────────────────
 const Treinos = ({ u, treinos, setTreinos }) => {
   const [aba, setAba] = useState("lista");
   const [tipoNovo, setTipoNovo] = useState(null);
@@ -371,7 +393,7 @@ const Treinos = ({ u, treinos, setTreinos }) => {
 
   if (tipoNovo === "ciclismo") return (
     <div className="space-y-3">
-      <div className="flex items-center gap-3"><button onClick={() => setTipoNovo(null)} className="text-gray-400 hover:text-gray-600 text-sm">← Voltar</button><h3 className="font-bold text-gray-900">🚴 Novo Treino Ciclismo</h3></div>
+      <div className="flex items-center gap-3"><button onClick={() => setTipoNovo(null)} className="text-gray-400 hover:text-orange-500 text-sm font-bold">← Voltar</button><h3 className="font-black text-gray-900 uppercase">🚴 Novo Treino Ciclismo</h3></div>
       <Card>
         <div className="grid grid-cols-2 gap-3">
           <Input label="Nome" value={fC.nome} onChange={v=>setFC({...fC,nome:v})} placeholder="ex: Saída manhã" className="col-span-2"/>
@@ -390,13 +412,13 @@ const Treinos = ({ u, treinos, setTreinos }) => {
           <Input label="Notas" value={fC.notas} onChange={v=>setFC({...fC,notas:v})} placeholder="Como correu?" className="col-span-2"/>
         </div>
       </Card>
-      <Btn onClick={gravarCiclo} className="w-full" size="lg">💾 Gravar Treino</Btn>
+      <Btn onClick={gravarCiclo} variant="orange" className="w-full" size="lg">💾 Gravar Treino</Btn>
     </div>
   );
 
   if (tipoNovo === "ginasio") return (
     <div className="space-y-3">
-      <div className="flex items-center gap-3"><button onClick={() => setTipoNovo(null)} className="text-gray-400 hover:text-gray-600 text-sm">← Voltar</button><h3 className="font-bold text-gray-900">🏋️ Novo Treino Ginásio</h3></div>
+      <div className="flex items-center gap-3"><button onClick={() => setTipoNovo(null)} className="text-gray-400 hover:text-orange-500 text-sm font-bold">← Voltar</button><h3 className="font-black text-gray-900 uppercase">🏋️ Novo Treino Ginásio</h3></div>
       <Card>
         <div className="grid grid-cols-2 gap-3">
           <Input label="Nome" value={fG.nome} onChange={v=>setFG({...fG,nome:v})} placeholder="ex: Push Day" className="col-span-2"/>
@@ -406,12 +428,12 @@ const Treinos = ({ u, treinos, setTreinos }) => {
       </Card>
       {fG.exercicios.map(ex => (
         <Card key={ex.id}>
-          <div className="flex justify-between"><p className="font-semibold text-sm">{ex.nome}</p><button onClick={()=>setFG(p=>({...p,exercicios:p.exercicios.filter(e=>e.id!==ex.id)}))} className="text-red-300 text-xs">✕</button></div>
-          <p className="text-xs text-gray-500 mt-1">{ex.series.map((s,i)=>`S${i+1}: ${s.reps}×${s.peso}kg`).join(" · ")}</p>
+          <div className="flex justify-between"><p className="font-black text-sm uppercase">{ex.nome}</p><button onClick={()=>setFG(p=>({...p,exercicios:p.exercicios.filter(e=>e.id!==ex.id)}))} className="text-red-300 font-bold">✕</button></div>
+          <p className="text-xs text-gray-500 font-bold mt-1">{ex.series.map((s,i)=>`S${i+1}: ${s.reps}×${s.peso}kg`).join(" · ")}</p>
         </Card>
       ))}
       <Card>
-        <p className="font-semibold text-sm text-gray-800 mb-2">+ Adicionar Exercício</p>
+        <p className="font-black text-sm text-gray-900 mb-2 uppercase">+ Adicionar Exercício</p>
         <Sel label="Exercício" value={nEx.nome} onChange={v=>setNEx({...nEx,nome:v})} options={[{v:"",l:"Selecionar..."}, ...EXERCICIOS.map(e=>({v:e,l:e}))]} className="mb-3"/>
         {nEx.series.map((s,i)=>(
           <div key={i} className="flex gap-2 mb-2 items-end">
@@ -419,9 +441,9 @@ const Treinos = ({ u, treinos, setTreinos }) => {
             <Input label="Peso(kg)" type="number" value={s.peso} onChange={v=>updSerie(i,"peso",v)} className="flex-1"/>
           </div>
         ))}
-        <div className="flex gap-2 mt-1"><Btn onClick={addSerie} variant="secondary" size="sm">+ Série</Btn><Btn onClick={addEx} size="sm">Adicionar</Btn></div>
+        <div className="flex gap-2 mt-1"><Btn onClick={addSerie} variant="secondary" size="sm">+ Série</Btn><Btn onClick={addEx} variant="orange" size="sm">Adicionar</Btn></div>
       </Card>
-      <Btn onClick={gravarGin} className="w-full" size="lg" disabled={!fG.exercicios.length}>💾 Gravar Treino</Btn>
+      <Btn onClick={gravarGin} variant="orange" className="w-full" size="lg" disabled={!fG.exercicios.length}>💾 Gravar Treino</Btn>
     </div>
   );
 
@@ -429,76 +451,85 @@ const Treinos = ({ u, treinos, setTreinos }) => {
     <div className="space-y-4">
       <div className="flex gap-2">
         {["lista","stats"].map(a=>(
-          <button key={a} onClick={()=>setAba(a)} className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-all ${aba===a?"bg-gray-900 text-white":"bg-gray-100 text-gray-600"}`}>
+          <button key={a} onClick={()=>setAba(a)} className={`px-4 py-2 rounded-xl text-sm font-black uppercase tracking-wide transition-all border-2 ${aba===a?"bg-gray-900 text-white border-gray-900":"bg-white text-gray-600 border-gray-200 hover:border-gray-400"}`}>
             {a==="lista"?"Histórico":"Estatísticas"}
           </button>
         ))}
       </div>
+
       {aba==="lista" && <>
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={()=>setTipoNovo("ciclismo")} className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center hover:bg-blue-100 transition-all"><div className="text-3xl mb-1">🚴</div><p className="text-sm font-semibold text-blue-700">Ciclismo</p></button>
-          <button onClick={()=>setTipoNovo("ginasio")} className="bg-green-50 border border-green-100 rounded-2xl p-4 text-center hover:bg-green-100 transition-all"><div className="text-3xl mb-1">🏋️</div><p className="text-sm font-semibold text-green-700">Ginásio</p></button>
+          <button onClick={()=>setTipoNovo("ciclismo")} className="bg-blue-50 border-2 border-blue-900 rounded-2xl p-4 text-center hover:bg-blue-100 transition-all shadow-[3px_3px_0px_0px_rgba(30,58,138,1)]">
+            <div className="text-3xl mb-1">🚴</div><p className="text-sm font-black text-blue-900 uppercase">Ciclismo</p>
+          </button>
+          <button onClick={()=>setTipoNovo("ginasio")} className="bg-orange-50 border-2 border-orange-900 rounded-2xl p-4 text-center hover:bg-orange-100 transition-all shadow-[3px_3px_0px_0px_rgba(124,45,18,1)]">
+            <div className="text-3xl mb-1">🏋️</div><p className="text-sm font-black text-orange-900 uppercase">Ginásio</p>
+          </button>
         </div>
-        {tUser.length===0 && <div className="text-center py-12 text-gray-400"><p className="text-3xl mb-2">🏆</p><p className="text-sm">Ainda sem treinos registados</p></div>}
+
+        {tUser.length===0 && <div className="text-center py-12"><p className="text-4xl mb-2">🏆</p><p className="text-sm font-bold text-gray-400 uppercase tracking-wide">Ainda sem treinos</p></div>}
+
         {tUser.map(t=>(
           <Card key={t.id}>
             <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-2">
-                <span>{t.tipo==="ciclismo"?"🚴":"🏋️"}</span>
-                <div><p className="font-semibold text-gray-800">{t.nome}</p><p className="text-xs text-gray-400">{new Date(t.data).toLocaleDateString("pt-PT")}</p></div>
+                <span className="text-2xl">{t.tipo==="ciclismo"?"🚴":"🏋️"}</span>
+                <div><p className="font-black text-gray-900 uppercase">{t.nome}</p><p className="text-xs font-bold text-gray-400">{new Date(t.data).toLocaleDateString("pt-PT")}</p></div>
               </div>
-              <button onClick={()=>setTreinos(p=>p.filter(x=>x.id!==t.id))} className="text-red-300 hover:text-red-500 text-xs">✕</button>
+              <button onClick={()=>setTreinos(p=>p.filter(x=>x.id!==t.id))} className="text-red-300 hover:text-red-500 font-bold">✕</button>
             </div>
             {t.tipo==="ciclismo" ? (
               <div className="grid grid-cols-3 gap-2 text-center">
-                {t.distancia&&<div className="bg-gray-50 rounded-xl p-2"><p className="text-xs text-gray-500">Dist.</p><p className="font-bold text-sm">{t.distancia}km</p></div>}
-                {t.duracao&&<div className="bg-gray-50 rounded-xl p-2"><p className="text-xs text-gray-500">Tempo</p><p className="font-bold text-sm">{t.duracao}min</p></div>}
-                {t.pot_med&&<div className="bg-gray-50 rounded-xl p-2"><p className="text-xs text-gray-500">Pot.</p><p className="font-bold text-sm">{t.pot_med}W</p></div>}
-                {t.fc_med&&<div className="bg-gray-50 rounded-xl p-2"><p className="text-xs text-gray-500">FC</p><p className="font-bold text-sm">{t.fc_med}bpm</p></div>}
-                {t.elevacao&&<div className="bg-gray-50 rounded-xl p-2"><p className="text-xs text-gray-500">Elev.</p><p className="font-bold text-sm">{t.elevacao}m</p></div>}
-                {t.tss&&<div className="bg-blue-50 rounded-xl p-2"><p className="text-xs text-blue-500">TSS</p><p className="font-bold text-sm text-blue-700">{t.tss}</p></div>}
+                {t.distancia&&<div className="bg-gray-50 border border-gray-200 rounded-xl p-2"><p className="text-xs font-bold text-gray-500 uppercase">Dist.</p><p className="font-black text-sm">{t.distancia}km</p></div>}
+                {t.duracao&&<div className="bg-gray-50 border border-gray-200 rounded-xl p-2"><p className="text-xs font-bold text-gray-500 uppercase">Tempo</p><p className="font-black text-sm">{t.duracao}min</p></div>}
+                {t.pot_med&&<div className="bg-gray-50 border border-gray-200 rounded-xl p-2"><p className="text-xs font-bold text-gray-500 uppercase">Pot.</p><p className="font-black text-sm">{t.pot_med}W</p></div>}
+                {t.fc_med&&<div className="bg-gray-50 border border-gray-200 rounded-xl p-2"><p className="text-xs font-bold text-gray-500 uppercase">FC</p><p className="font-black text-sm">{t.fc_med}bpm</p></div>}
+                {t.elevacao&&<div className="bg-gray-50 border border-gray-200 rounded-xl p-2"><p className="text-xs font-bold text-gray-500 uppercase">Elev.</p><p className="font-black text-sm">{t.elevacao}m</p></div>}
+                {t.tss&&<div className="bg-orange-50 border border-orange-200 rounded-xl p-2"><p className="text-xs font-bold text-orange-500 uppercase">TSS</p><p className="font-black text-sm text-orange-600">{t.tss}</p></div>}
               </div>
             ) : (
               <div>{t.exercicios?.map(ex=>(
-                <div key={ex.id} className="py-1.5 border-t border-gray-50">
-                  <p className="text-sm font-medium text-gray-700">{ex.nome}</p>
-                  <p className="text-xs text-gray-400">{ex.series.map((s,i)=>`S${i+1}: ${s.reps}×${s.peso}kg`).join(" · ")}</p>
+                <div key={ex.id} className="py-1.5 border-t-2 border-gray-100">
+                  <p className="text-sm font-black text-gray-800 uppercase">{ex.nome}</p>
+                  <p className="text-xs font-bold text-gray-400">{ex.series.map((s,i)=>`S${i+1}: ${s.reps}×${s.peso}kg`).join(" · ")}</p>
                 </div>
               ))}</div>
             )}
-            {t.notas&&<p className="text-xs text-gray-400 mt-2 italic">"{t.notas}"</p>}
+            {t.notas&&<p className="text-xs font-bold text-gray-400 mt-2 italic">"{t.notas}"</p>}
           </Card>
         ))}
       </>}
+
       {aba==="stats" && <div className="space-y-4">
         <Card>
-          <p className="font-semibold text-gray-800 mb-3">📊 Volume (8 semanas)</p>
+          <p className="font-black text-gray-900 uppercase tracking-wide text-sm mb-3">📊 Volume (8 semanas)</p>
           <ResponsiveContainer width="100%" height={150}>
-            <BarChart data={stats8}><CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6"/><XAxis dataKey="sem" tick={{fontSize:11}}/><YAxis tick={{fontSize:11}}/><Tooltip/>
-              <Bar dataKey="ciclo" fill="#3b82f6" radius={[4,4,0,0]} name="Ciclismo"/>
-              <Bar dataKey="gin" fill="#10b981" radius={[4,4,0,0]} name="Ginásio"/>
+            <BarChart data={stats8}><CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6"/><XAxis dataKey="sem" tick={{fontSize:11,fontWeight:"bold"}}/><YAxis tick={{fontSize:11}}/><Tooltip/>
+              <Bar dataKey="ciclo" fill="#1d4ed8" radius={[4,4,0,0]} name="Ciclismo"/>
+              <Bar dataKey="gin" fill="#f97316" radius={[4,4,0,0]} name="Ginásio"/>
             </BarChart>
           </ResponsiveContainer>
         </Card>
         <Card>
-          <p className="font-semibold text-gray-800 mb-3">⚡ TSS Semanal</p>
+          <p className="font-black text-gray-900 uppercase tracking-wide text-sm mb-3">⚡ TSS Semanal</p>
           <ResponsiveContainer width="100%" height={130}>
-            <BarChart data={stats8}><CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6"/><XAxis dataKey="sem" tick={{fontSize:11}}/><YAxis tick={{fontSize:11}}/><Tooltip/>
-              <Bar dataKey="tss" fill="#f59e0b" radius={[4,4,0,0]} name="TSS"/>
+            <BarChart data={stats8}><CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6"/><XAxis dataKey="sem" tick={{fontSize:11,fontWeight:"bold"}}/><YAxis tick={{fontSize:11}}/><Tooltip/>
+              <Bar dataKey="tss" fill="#111827" radius={[4,4,0,0]} name="TSS"/>
             </BarChart>
           </ResponsiveContainer>
         </Card>
         <div className="grid grid-cols-2 gap-3">
-          <Card className="text-center"><p className="text-2xl font-bold text-blue-600">{tUser.filter(t=>t.tipo==="ciclismo").length}</p><p className="text-xs text-gray-500 mt-1">Saídas ciclismo</p></Card>
-          <Card className="text-center"><p className="text-2xl font-bold text-green-600">{tUser.filter(t=>t.tipo==="ginasio").length}</p><p className="text-xs text-gray-500 mt-1">Sessões ginásio</p></Card>
-          <Card className="text-center"><p className="text-2xl font-bold text-gray-800">{tUser.filter(t=>t.tipo==="ciclismo").reduce((s,t)=>s+Number(t.distancia||0),0).toFixed(0)}km</p><p className="text-xs text-gray-500 mt-1">Total pedalado</p></Card>
-          <Card className="text-center"><p className="text-2xl font-bold text-amber-500">{tUser.filter(t=>t.tipo==="ciclismo").reduce((s,t)=>s+Number(t.tss||0),0)}</p><p className="text-xs text-gray-500 mt-1">TSS total</p></Card>
+          <StatBox label="Saídas ciclismo" value={tUser.filter(t=>t.tipo==="ciclismo").length} unit="" color="text-blue-600"/>
+          <StatBox label="Sessões ginásio" value={tUser.filter(t=>t.tipo==="ginasio").length} unit="" color="text-orange-500"/>
+          <StatBox label="Total pedalado" value={tUser.filter(t=>t.tipo==="ciclismo").reduce((s,t)=>s+Number(t.distancia||0),0).toFixed(0)} unit="km" color="text-gray-900"/>
+          <StatBox label="TSS total" value={tUser.filter(t=>t.tipo==="ciclismo").reduce((s,t)=>s+Number(t.tss||0),0)} unit="" color="text-amber-500"/>
         </div>
       </div>}
     </div>
   );
 };
 
+// ── PERFIL ────────────────────────────────────────────────────────────────────
 const Perfil = ({ u, setUsuarios, pesos, setPesos }) => {
   const [novoPeso, setNovoPeso] = useState("");
   const [editando, setEditando] = useState(false);
@@ -509,13 +540,16 @@ const Perfil = ({ u, setUsuarios, pesos, setPesos }) => {
 
   return (
     <div className="space-y-4">
-      <Card>
+      <div className="bg-gray-900 rounded-2xl p-5 border-2 border-gray-900 shadow-[4px_4px_0px_0px_rgba(249,115,22,1)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">{u.avatar}</span>
-            <div><p className="font-bold text-gray-900 text-lg">{u.nome}</p><p className="text-xs text-gray-500">{u.altura}cm · {ultimoPeso}kg · IMC {imc}</p></div>
+            <span className="text-5xl">{u.avatar}</span>
+            <div>
+              <p className="font-black text-white text-xl uppercase">{u.nome}</p>
+              <p className="text-orange-400 text-xs font-bold">{u.altura}cm · {ultimoPeso}kg · IMC {imc}</p>
+            </div>
           </div>
-          <Btn onClick={()=>setEditando(!editando)} variant="secondary" size="sm">{editando?"Cancelar":"Editar"}</Btn>
+          <Btn onClick={()=>setEditando(!editando)} variant="orange" size="sm">{editando?"Cancelar":"Editar"}</Btn>
         </div>
         {editando && (
           <div className="mt-4 grid grid-cols-2 gap-3">
@@ -525,15 +559,16 @@ const Perfil = ({ u, setUsuarios, pesos, setPesos }) => {
             <Input label="Obj. Hidratos (g)" type="number" value={ef.obj_hid} onChange={v=>setEf({...ef,obj_hid:v})}/>
             <Input label="Obj. Gordura (g)" type="number" value={ef.obj_gord} onChange={v=>setEf({...ef,obj_gord:v})}/>
             <Input label="Obj. Água (ml)" type="number" value={ef.obj_agua} onChange={v=>setEf({...ef,obj_agua:v})}/>
-            <Btn onClick={()=>{setUsuarios(p=>p.map(x=>x.id===u.id?{...x,...ef}:x));setEditando(false);}} className="col-span-2">Guardar</Btn>
+            <Btn onClick={()=>{setUsuarios(p=>p.map(x=>x.id===u.id?{...x,...ef}:x));setEditando(false);}} variant="orange" className="col-span-2">Guardar</Btn>
           </div>
         )}
-      </Card>
+      </div>
+
       <Card>
-        <p className="font-semibold text-gray-800 mb-3">⚖️ Registo de Peso</p>
+        <p className="font-black text-gray-900 uppercase tracking-wide text-sm mb-3">⚖️ Registo de Peso</p>
         <div className="flex gap-2 mb-4">
           <Input type="number" value={novoPeso} onChange={setNovoPeso} placeholder="ex: 78.5" className="flex-1"/>
-          <Btn onClick={()=>{if(!novoPeso)return;setPesos(p=>[...p,{id:Date.now(),userId:u.id,data:hoje(),peso:Number(novoPeso)}]);setNovoPeso("");}}>Registar</Btn>
+          <Btn onClick={()=>{if(!novoPeso)return;setPesos(p=>[...p,{id:Date.now(),userId:u.id,data:hoje(),peso:Number(novoPeso)}]);setNovoPeso("");}} variant="orange">Registar</Btn>
         </div>
         {reg.length > 1 && (
           <ResponsiveContainer width="100%" height={150}>
@@ -542,17 +577,21 @@ const Perfil = ({ u, setUsuarios, pesos, setPesos }) => {
               <XAxis dataKey="data" tick={{fontSize:10}} tickFormatter={d=>d.slice(5)}/>
               <YAxis domain={["dataMin - 2","dataMax + 2"]} tick={{fontSize:10}} unit="kg"/>
               <Tooltip formatter={v=>`${v} kg`}/>
-              <Line type="monotone" dataKey="peso" stroke={u.cor} dot={{fill:u.cor,r:3}} name="Peso"/>
+              <Line type="monotone" dataKey="peso" stroke="#f97316" strokeWidth={2} dot={{fill:"#f97316",r:4}} name="Peso"/>
             </LineChart>
           </ResponsiveContainer>
         )}
-        {reg.length===0 && <p className="text-xs text-gray-400 text-center py-4">Ainda sem registos de peso</p>}
+        {reg.length===0 && <p className="text-xs font-bold text-gray-400 text-center py-4 uppercase">Ainda sem registos de peso</p>}
       </Card>
+
       <Card>
-        <p className="font-semibold text-gray-800 mb-3">🎯 Objetivos Diários</p>
+        <p className="font-black text-gray-900 uppercase tracking-wide text-sm mb-3">🎯 Objetivos Diários</p>
         <div className="space-y-2">
           {[["Calorias",u.obj_cal,"kcal"],["Proteína",u.obj_prot,"g"],["Hidratos",u.obj_hid,"g"],["Gordura",u.obj_gord,"g"],["Água",u.obj_agua,"ml"]].map(([l,v,unit])=>(
-            <div key={l} className="flex justify-between text-sm"><span className="text-gray-600">{l}</span><span className="font-semibold">{v} {unit}</span></div>
+            <div key={l} className="flex justify-between items-center py-1.5 border-b-2 border-gray-100 last:border-0">
+              <span className="text-xs font-black text-gray-500 uppercase tracking-wide">{l}</span>
+              <span className="font-black text-gray-900">{v} <span className="text-gray-400 text-xs">{unit}</span></span>
+            </div>
           ))}
         </div>
       </Card>
@@ -560,6 +599,7 @@ const Perfil = ({ u, setUsuarios, pesos, setPesos }) => {
   );
 };
 
+// ── APP PRINCIPAL ─────────────────────────────────────────────────────────────
 export default function App() {
   const [usuarios, setUsuarios] = useState(USUARIOS_INICIAIS);
   const [ativo, setAtivo] = useState(null);
@@ -581,25 +621,30 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-40">
+      <div className="bg-gray-900 border-b-4 border-orange-500 sticky top-0 z-40">
         <div className="max-w-lg mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-2"><span className="text-xl">{u?.avatar}</span><span className="font-bold text-gray-900">FamilyFit</span></div>
-          <button onClick={()=>setAtivo(null)} className="text-xs text-gray-400 hover:text-gray-600 bg-gray-100 px-3 py-1.5 rounded-xl">Trocar perfil</button>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">{u?.avatar}</span>
+            <span className="font-black text-white uppercase tracking-wide">FamilyFit</span>
+          </div>
+          <button onClick={()=>setAtivo(null)} className="text-xs font-bold text-orange-400 hover:text-orange-300 bg-gray-800 px-3 py-1.5 rounded-xl border border-gray-700">Trocar perfil</button>
         </div>
       </div>
+
       <div className="max-w-lg mx-auto px-4 py-4 pb-24">
         {pagina==="dashboard" && <Dashboard u={u} registos={registos} treinos={treinos}/>}
         {pagina==="nutricao" && <Nutricao u={u} registos={registos} setRegistos={setRegistos}/>}
         {pagina==="treinos" && <Treinos u={u} treinos={treinos} setTreinos={setTreinos}/>}
         {pagina==="perfil" && <Perfil u={u} setUsuarios={setUsuarios} pesos={pesos} setPesos={setPesos}/>}
       </div>
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40">
+
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-gray-900 z-40">
         <div className="max-w-lg mx-auto flex">
           {nav.map(n=>(
-            <button key={n.id} onClick={()=>setPagina(n.id)} className={`flex-1 flex flex-col items-center py-3 transition-all ${pagina===n.id?"text-gray-900":"text-gray-400 hover:text-gray-600"}`}>
+            <button key={n.id} onClick={()=>setPagina(n.id)} className={`flex-1 flex flex-col items-center py-3 transition-all ${pagina===n.id?"text-orange-500":"text-gray-400 hover:text-gray-600"}`}>
               <span className="text-xl">{n.icon}</span>
-              <span className="text-xs mt-0.5 font-medium">{n.label}</span>
-              {pagina===n.id && <div className="w-1 h-1 rounded-full bg-gray-900 mt-0.5"/>}
+              <span className="text-xs mt-0.5 font-black uppercase tracking-wide">{n.label}</span>
+              {pagina===n.id && <div className="w-4 h-1 rounded-full bg-orange-500 mt-0.5"/>}
             </button>
           ))}
         </div>
